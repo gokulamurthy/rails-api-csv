@@ -1,0 +1,13 @@
+class ApplicationController < ActionController::Base
+  # Prevent CSRF attacks by raising an exception.
+  # For APIs, you may want to use :null_session instead.
+  # protect_from_forgery with: :exception
+  #
+  #
+  protected
+
+  def render_response(resp)
+    status = resp.delete(:status) || 200
+    render json: resp, status: status
+  end
+end

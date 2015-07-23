@@ -1,0 +1,63 @@
+== README
+
+This README would normally document whatever steps are necessary to get the
+application up and running.
+
+Things you may want to cover:
+
+* Ruby version
+
+2.2.0
+
+* Configuration
+
+`gem install bundler`
+`bundle install`
+
+Setup IPALLOC_DATAPATH in .env file
+
+* Starting Server
+
+`bundle exec unicorn -c ./config/unicorn.rb`
+
+* Running Tests
+
+== API Documentation
+
+GET /devices/<address>
+
+Identifies the device currently associated with a given address.
+Accepts: 
+  <address> is a string, like 1.2.3.4 
+Returns:
+  currently associated device string with ip and a 200 HTTP code.
+
+Example: GET /devices/1.2.3.4
+returns:
+{"device":"device2","ip":"1.2.3.4"}
+If the address is not currently assigned, returns a 404 HTTP code response with JSON body: {"error":"NotFound","ip":"1.2.3.4"}
+
+
+POST /addresses/assign
+
+Assigns an address to a device.
+
+Accepts: (JSON format)
+  <ip>      like 1.2.3.4
+  <device>  like device123
+
+Returns:
+  assigned IP with device and a 201 HTTP code.
+
+Example:
+POST /addresses/assign
+with JSON data:
+{"ip":"1.2.3.4", "device":"device123"}
+returns a 201 HTTP code and the created data:
+{"ip":"1.2.3.4", "device":"device123"}
+
+If the param ip or device is not specified, an error message would be returned with code 400, like: {"ip":"", "error":"Ip can't be blank"}
+If the param ip is not of ipv4 format or if the device is not of format 'device<0-9>', and error message would be returned with code 400. like:
+ {"ip":"", "error":"Ip is invalid"}
+An address outside the range of the IPv4 block you have been allocated cannot be assigned and would return a 400 return code with an appropriate error message like: {"ip":"1.10.3.4", "error":"Ip must be within the range"}
+Addresses are assigned on a first-come, first-serve basis. Any attempt to assign an address that has already been assigned to a device would return a 409 HTTP Code with an appropriate error message like: {"ip":"1.2.3.4", "error":"Ip is already assigned"}
